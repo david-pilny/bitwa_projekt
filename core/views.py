@@ -6,7 +6,7 @@ from .models import LikePost, Profile, Post, FollowerCount, Room, Message
 from itertools import chain
 import random
 from django.http import HttpResponse, JsonResponse
-from django.core.checks import messages
+# from django.core.checks import messages
 
 from core.models import Profile
 
@@ -74,10 +74,10 @@ def signup(request):
 
         if password == password2:
             if User.objects.filter(email=email).exists():
-                messages.info(request, 'Email already taken')
+                messages.info(request, 'Email je již zabraný')
                 return redirect('signup')
             elif User.objects.filter(username=username).exists():
-                messages.info(request, 'Username already taken')
+                messages.info(request, 'Uživatelské jméno už někdo používá')
                 return redirect('signup')
             else:
                 user = User.objects.create_user(
@@ -94,7 +94,7 @@ def signup(request):
                 new_profile.save()
                 return redirect('settings')
         else:
-            messages.info(request, 'Password not matching')
+            messages.info(request, 'Hesla se neshodují')
             return redirect('signup')
 
     else:
@@ -112,7 +112,7 @@ def signin(request):
             auth.login(request, user)
             return redirect('/')
         else:
-            messages.info(request, 'Credentials invalid')
+            messages.info(request, 'Neplatné uživatelské jméno nebo heslo')
             return redirect('signin')
     else:
         return render(request, 'signin.html')
@@ -297,9 +297,16 @@ def search(request):
     return render(request, 'search.html', context)
 
 
+@login_required(login_url='signin')
+def todolist(request):
+    user_object = User.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+    return render(request, 'todolist.html', {'user_profile': user_profile})
+
 # ============
 # Chat Room
 # ============
+
 
 @login_required(login_url='signin')
 def chat(request):
@@ -336,9 +343,12 @@ def send(request):
     username = request.user.username
     room_id = request.POST['room_id']
 
-    new_message = Message.objects.create(
-        value=message, user=username, room=room_id)
-    new_message.save()
+    if len(message) > 0:
+        if message.isspace() == False:
+            new_message = Message.objects.create(
+                value=message, user=username, room=room_id)
+            new_message.save()
+
     return HttpResponse('Message sent successfully')
 
 
