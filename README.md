@@ -1,9 +1,11 @@
+## Spuštění projektu:
+
+V adresáři projektu je třeba provést migrace databáze: 
+```sh
+python manage.py makemigrations 
+python manage.py migrate
+```
 Spuštění projektu:
-
-V adresáři projektu  je třeba provést migrace databáze:
-	python manage.py makemigrations
-	python manage.py migrate
-
-Spuštění projektu:
-	python manage.py runserver
-
+```sh
+python manage.py runserver 
+```
