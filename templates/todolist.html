@@ -269,22 +269,38 @@
         var url = 'http://127.0.0.1:8000/api/task-create/'
         if (activeItem != null) {
           var url = `http://127.0.0.1:8000/api/task-update/${activeItem.id}/`
-          activeItem = null
+          //activeItem = null
         }
 
         var title = document.getElementById('title').value
         var user_object = document.getElementById('user_object').value
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-            'X-CSRFToken': csrftoken,
-          },
-          body: JSON.stringify({ title: title, user: user_object }),
-        }).then(function (response) {
-          buildList(user_object)
-          document.getElementById('form').reset()
-        })
+
+        if (activeItem != null) {
+          activeItem = null
+          fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Content-type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ title: title, user: user_object }),
+          }).then(function (response) {
+            buildList(user_object)
+            document.getElementById('form').reset()
+          })
+        } else {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ title: title, user: user_object }),
+          }).then(function (response) {
+            buildList(user_object)
+            document.getElementById('form').reset()
+          })
+        }
       })
 
       function editItem(item) {
@@ -312,7 +328,7 @@
 
         item.completed = !item.completed
         fetch(`http://127.0.0.1:8000/api/task-update/${item.id}/`, {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-type': 'application/json',
             'X-CSRFToken': csrftoken,
